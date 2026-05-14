@@ -83,9 +83,9 @@ export function ChatPanel({
     const cleaned = text.split(/\n---\n/)[0].trim();
     if (cleaned) {
       lastSpokenRef.current = last.id;
-      speak(cleaned, settings.voiceId);
+      speak(cleaned);
     }
-  }, [messages, status, settings.autoSpeak, settings.voiceId, speak]);
+  }, [messages, status, settings.autoSpeak, speak]);
 
   const submit = async (text: string) => {
     const value = text.trim();
