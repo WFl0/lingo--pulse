@@ -49,8 +49,8 @@ export function TopBar({
           </button>
         )}
 
-        <div className="flex-1 flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="relative flex h-2 w-2 shrink-0">
             <span
               className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${
                 speaking ? "animate-ping bg-[var(--saudi)]" : ""
@@ -62,9 +62,16 @@ export function TopBar({
               }`}
             />
           </span>
-          <span className="text-xs text-muted-foreground tracking-wider uppercase">
+          <span className="text-[10px] text-muted-foreground tracking-wider uppercase hidden sm:inline">
             {speaking ? "Speaking" : muted ? "Muted" : "Live"}
           </span>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center min-w-0">
+          <h1 className="text-base md:text-lg font-bold tracking-[0.2em] truncate">
+            <span className="text-gradient-primary">LINGO</span>{" "}
+            <span className="text-gradient-gold">PULSE</span>
+          </h1>
         </div>
 
         <ToolbarBtn
