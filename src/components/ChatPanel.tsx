@@ -83,9 +83,9 @@ export function ChatPanel({
     const cleaned = text.split(/\n---\n/)[0].trim();
     if (cleaned) {
       lastSpokenRef.current = last.id;
-      speak(cleaned, settings.voiceId);
+      speak(cleaned);
     }
-  }, [messages, status, settings.autoSpeak, settings.voiceId, speak]);
+  }, [messages, status, settings.autoSpeak, speak]);
 
   const submit = async (text: string) => {
     const value = text.trim();
@@ -142,7 +142,7 @@ export function ChatPanel({
   };
 
   const playLast = () => {
-    if (lastAssistantText) speak(lastAssistantText, settings.voiceId);
+    if (lastAssistantText) speak(lastAssistantText);
   };
 
   return (
@@ -167,7 +167,7 @@ export function ChatPanel({
               <MessageBubble
                 key={m.id}
                 message={m}
-                onReplay={(text) => speak(text, settings.voiceId)}
+                onReplay={(text) => speak(text)}
                 speaking={speaking}
                 onStop={stopSpeak}
               />

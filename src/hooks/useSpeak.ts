@@ -1,15 +1,15 @@
 import { useCallback, useRef, useState } from "react";
+import { DEFAULT_VOICE_ID } from "@/lib/types";
 
 /**
- * Speaks text using ElevenLabs (premium). If ElevenLabs fails (rate limit,
- * missing key, network) we transparently fall back to the browser's built-in
- * SpeechSynthesis so the user always hears a voice.
+ * Speaks text with a single premium female voice (ElevenLabs - Sarah).
+ * Falls back transparently to the browser's built-in female voice if the
+ * ElevenLabs API is unavailable, so the user always hears a voice.
  */
 export function useSpeak() {
   const [speaking, setSpeaking] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const urlRef = useRef<string | null>(null);
-  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const stop = useCallback(() => {
     if (audioRef.current) {
@@ -23,7 +23,6 @@ export function useSpeak() {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
-    utterRef.current = null;
     setSpeaking(false);
   }, []);
 
@@ -35,19 +34,24 @@ export function useSpeak() {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "en-US";
       u.rate = 1;
-      u.pitch = 1;
-      // Try to pick a nice English voice
+      u.pitch = 1.05;
       const voices = window.speechSynthesis.getVoices();
+      // Prefer well-known female English voices
       const preferred =
         voices.find((v) =>
-          /Google US English|Samantha|Microsoft Aria|Microsoft Jenny/i.test(
+          /Samantha|Google US English|Microsoft Aria|Microsoft Jenny|Microsoft Zira|Karen|Victoria|Tessa|Serena/i.test(
             v.name,
           ),
-        ) || voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
+        ) ||
+        voices.find(
+          (v) =>
+            v.lang?.toLowerCase().startsWith("en") &&
+            /female|woman|girl/i.test(v.name),
+        ) ||
+        voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
       if (preferred) u.voice = preferred;
       u.onend = () => setSpeaking(false);
       u.onerror = () => setSpeaking(false);
-      utterRef.current = u;
       setSpeaking(true);
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
@@ -59,21 +63,18 @@ export function useSpeak() {
   }, []);
 
   const speak = useCallback(
-    async (text: string, voiceId: string) => {
+    async (text: string) => {
       if (!text.trim()) return;
       stop();
-      // Pre-create audio element synchronously to preserve user gesture
       const audio = new Audio();
       audioRef.current = audio;
       try {
         const res = await fetch("/api/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, voiceId }),
+          body: JSON.stringify({ text, voiceId: DEFAULT_VOICE_ID }),
         });
         if (!res.ok) {
-          const errText = await res.text().catch(() => "");
-          console.warn("ElevenLabs TTS unavailable, falling back:", res.status, errText);
           speakBrowser(text);
           return;
         }
@@ -101,8 +102,7 @@ export function useSpeak() {
           setSpeaking(false);
           speakBrowser(text);
         });
-      } catch (e) {
-        console.error(e);
+      } catch {
         speakBrowser(text);
       }
     },
