@@ -87,6 +87,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "LINGO PULSE — Luxury AI Voice Companion" },
+      { name: "description", content: "Lingo Pulse AI is an interactive AI assistant that converses with users via voice and text." },
+      { property: "og:description", content: "Lingo Pulse AI is an interactive AI assistant that converses with users via voice and text." },
+      { name: "twitter:description", content: "Lingo Pulse AI is an interactive AI assistant that converses with users via voice and text." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
