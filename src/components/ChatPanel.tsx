@@ -167,7 +167,7 @@ export function ChatPanel({
               <MessageBubble
                 key={m.id}
                 message={m}
-                onReplay={(text) => speak(text, settings.voiceId)}
+                onReplay={(text) => speak(text)}
                 speaking={speaking}
                 onStop={stopSpeak}
               />
