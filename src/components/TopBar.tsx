@@ -68,10 +68,15 @@ export function TopBar({
         </div>
 
         <div className="flex-1 flex items-center justify-center min-w-0">
-          <h1 className="text-base md:text-lg font-bold tracking-[0.2em] truncate">
-            <span className="text-gradient-primary">LINGO</span>{" "}
-            <span className="text-gradient-gold">PULSE</span>
-          </h1>
+          <div className="flex items-center gap-3 select-none">
+            <span className="hidden sm:block h-px w-8 bg-gradient-to-r from-transparent to-[var(--gold)]/60" />
+            <h1 className="text-base md:text-lg font-bold tracking-[0.3em] truncate">
+              <span className="text-shimmer">LINGO</span>
+              <span className="mx-1.5 text-[var(--gold)]/60">·</span>
+              <span className="text-shimmer">PULSE</span>
+            </h1>
+            <span className="hidden sm:block h-px w-8 bg-gradient-to-l from-transparent to-[var(--gold)]/60" />
+          </div>
         </div>
 
         <ToolbarBtn
