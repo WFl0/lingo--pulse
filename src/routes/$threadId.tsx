@@ -42,6 +42,12 @@ function ThreadPage() {
     }
   }, [threadId]);
 
+  const handleMessagesChange = useCallback(
+    () => setRefreshKey((k) => k + 1),
+    [],
+  );
+  const handleOpenSettings = useCallback(() => setSettingsOpen(true), []);
+
   if (!thread || !settings) {
     return (
       <div className="min-h-screen grid place-items-center">
@@ -51,12 +57,6 @@ function ThreadPage() {
       </div>
     );
   }
-
-  const handleMessagesChange = useCallback(
-    () => setRefreshKey((k) => k + 1),
-    [],
-  );
-  const handleOpenSettings = useCallback(() => setSettingsOpen(true), []);
 
   return (
     <div className="flex min-h-screen aurora-bg">
