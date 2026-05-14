@@ -4,7 +4,6 @@ export type ResponseStyle = "formal" | "friendly" | "concise" | "deep";
 
 export type AppSettings = {
   style: ResponseStyle;
-  voiceId: string;
   autoSpeak: boolean;
   grammarCorrection: boolean;
 };
@@ -16,9 +15,11 @@ export type Thread = {
   messages: UIMessage[];
 };
 
+// Single, premium female voice (Sarah - ElevenLabs).
+export const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";
+
 export const DEFAULT_SETTINGS: AppSettings = {
   style: "friendly",
-  voiceId: "EXAVITQu4vr4xnSDxMaL", // Sarah
   autoSpeak: true,
   grammarCorrection: true,
 };
@@ -33,11 +34,3 @@ export const STYLE_PROMPTS: Record<ResponseStyle, string> = {
   deep: "Engage deeply with the user's ideas. Ask probing questions, offer nuanced perspectives, and challenge assumptions kindly.",
 };
 
-export const VOICES = [
-  { id: "EXAVITQu4vr4xnSDxMaL", name: "Sarah" },
-  { id: "JBFqnCBsd6RMkjVDRZzb", name: "George" },
-  { id: "TX3LPaxmHKxFdv7VOQHJ", name: "Liam" },
-  { id: "XrExE9yKIg1WjnnlVkGX", name: "Matilda" },
-  { id: "pFZP5JQG7iQjIQuC4Bku", name: "Lily" },
-  { id: "nPczCjzI2devNBz1zQrb", name: "Brian" },
-];
