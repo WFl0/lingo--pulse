@@ -59,7 +59,7 @@ function ThreadPage() {
   }
 
   return (
-    <div className="flex min-h-screen aurora-bg">
+    <div className="flex min-h-screen aurora-bg vignette grain">
       <Welcome />
       <Sidebar
         onOpenSettings={handleOpenSettings}
