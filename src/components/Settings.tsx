@@ -103,25 +103,14 @@ export function Settings({ open, onClose, onChange }: Props) {
                 </div>
               </section>
 
-              <section>
-                <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">
+              <section className="glass rounded-xl px-4 py-3">
+                <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
                   Voice
                 </h3>
-                <select
-                  value={settings.voiceId}
-                  onChange={(e) => update({ voiceId: e.target.value })}
-                  className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent outline-none focus:ring-2 focus:ring-primary"
-                >
-                  {VOICES.map((v) => (
-                    <option
-                      key={v.id}
-                      value={v.id}
-                      className="bg-background text-foreground"
-                    >
-                      {v.name}
-                    </option>
-                  ))}
-                </select>
+                <p className="text-sm">
+                  <span className="text-gradient-gold font-semibold">Sarah</span>{" "}
+                  <span className="text-muted-foreground">— premium female voice</span>
+                </p>
               </section>
 
               <section className="space-y-3">
