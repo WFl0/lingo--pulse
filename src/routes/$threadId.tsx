@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useParams } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatPanel } from "@/components/ChatPanel";
 import { Welcome } from "@/components/Welcome";
@@ -52,11 +52,17 @@ function ThreadPage() {
     );
   }
 
+  const handleMessagesChange = useCallback(
+    () => setRefreshKey((k) => k + 1),
+    [],
+  );
+  const handleOpenSettings = useCallback(() => setSettingsOpen(true), []);
+
   return (
     <div className="flex min-h-screen aurora-bg">
       <Welcome />
       <Sidebar
-        onOpenSettings={() => setSettingsOpen(true)}
+        onOpenSettings={handleOpenSettings}
         refreshKey={refreshKey}
       />
       <ChatPanel
@@ -64,8 +70,8 @@ function ThreadPage() {
         thread={thread}
         settings={settings}
         onSettingsChange={setSettings}
-        onOpenSettings={() => setSettingsOpen(true)}
-        onMessagesChange={() => setRefreshKey((k) => k + 1)}
+        onOpenSettings={handleOpenSettings}
+        onMessagesChange={handleMessagesChange}
       />
       <Settings
         open={settingsOpen}

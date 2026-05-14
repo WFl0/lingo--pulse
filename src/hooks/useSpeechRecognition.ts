@@ -29,15 +29,24 @@ export function useSpeechRecognition() {
     }
     setSupported(true);
     const rec: SpeechRecognitionLike = new SR();
-    rec.continuous = true;
+    // Single-utterance mode = far fewer false triggers from background noise.
+    rec.continuous = false;
     rec.interimResults = true;
     rec.lang = "en-US";
     rec.onresult = (event: any) => {
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const res = event.results[i];
-        if (res.isFinal) finalRef.current += res[0].transcript + " ";
-        else interim += res[0].transcript;
+        // Only commit results we're confident about (>=0.5) to reduce
+        // misunderstandings; show interim live without committing.
+        const conf = res[0].confidence ?? 1;
+        if (res.isFinal) {
+          if (conf >= 0.5 || res[0].transcript.trim().length > 2) {
+            finalRef.current += res[0].transcript + " ";
+          }
+        } else {
+          interim += res[0].transcript;
+        }
       }
       setTranscript((finalRef.current + interim).trim());
     };
