@@ -5,18 +5,27 @@ import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Volume2, VolumeX, Sparkles } from "lucide-react";
 import { MicButton, WaveBars } from "./MicButton";
+import { TopBar } from "./TopBar";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeak } from "@/hooks/useSpeak";
-import { updateThreadMessages } from "@/lib/storage";
+import { updateThreadMessages, saveSettings } from "@/lib/storage";
 import type { AppSettings, Thread } from "@/lib/types";
 
 type Props = {
   thread: Thread;
   settings: AppSettings;
+  onSettingsChange: (s: AppSettings) => void;
+  onOpenSettings: () => void;
   onMessagesChange?: () => void;
 };
 
-export function ChatPanel({ thread, settings, onMessagesChange }: Props) {
+export function ChatPanel({
+  thread,
+  settings,
+  onSettingsChange,
+  onOpenSettings,
+  onMessagesChange,
+}: Props) {
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -114,8 +123,39 @@ export function ChatPanel({ thread, settings, onMessagesChange }: Props) {
 
   const isLoading = status === "submitted" || status === "streaming";
 
+  const lastAssistantText = (() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (m.role === "assistant") {
+        const t = extractText(m).split(/\n---\n/)[0].trim();
+        if (t) return t;
+      }
+    }
+    return "";
+  })();
+
+  const toggleMute = () => {
+    const next = { ...settings, autoSpeak: !settings.autoSpeak };
+    saveSettings(next);
+    onSettingsChange(next);
+    if (settings.autoSpeak) stopSpeak();
+  };
+
+  const playLast = () => {
+    if (lastAssistantText) speak(lastAssistantText, settings.voiceId);
+  };
+
   return (
     <div className="flex-1 flex flex-col h-screen min-w-0">
+      <TopBar
+        settings={settings}
+        speaking={speaking}
+        hasLastReply={!!lastAssistantText}
+        onToggleMute={toggleMute}
+        onPlayLast={playLast}
+        onStop={stopSpeak}
+        onOpenSettings={onOpenSettings}
+      />
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-8 py-8">
         <div className="max-w-3xl mx-auto space-y-6">

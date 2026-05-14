@@ -63,6 +63,8 @@ function ThreadPage() {
         key={thread.id}
         thread={thread}
         settings={settings}
+        onSettingsChange={setSettings}
+        onOpenSettings={() => setSettingsOpen(true)}
         onMessagesChange={() => setRefreshKey((k) => k + 1)}
       />
       <Settings
