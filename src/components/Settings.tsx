@@ -5,7 +5,6 @@ import { loadSettings, saveSettings } from "@/lib/storage";
 import {
   type AppSettings,
   type ResponseStyle,
-  VOICES,
 } from "@/lib/types";
 
 type Props = {
