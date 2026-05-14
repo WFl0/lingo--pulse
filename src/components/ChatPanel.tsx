@@ -142,7 +142,7 @@ export function ChatPanel({
   };
 
   const playLast = () => {
-    if (lastAssistantText) speak(lastAssistantText, settings.voiceId);
+    if (lastAssistantText) speak(lastAssistantText);
   };
 
   return (
