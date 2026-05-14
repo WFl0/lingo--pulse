@@ -5,18 +5,27 @@ import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Volume2, VolumeX, Sparkles } from "lucide-react";
 import { MicButton, WaveBars } from "./MicButton";
+import { TopBar } from "./TopBar";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeak } from "@/hooks/useSpeak";
-import { updateThreadMessages } from "@/lib/storage";
+import { updateThreadMessages, saveSettings } from "@/lib/storage";
 import type { AppSettings, Thread } from "@/lib/types";
 
 type Props = {
   thread: Thread;
   settings: AppSettings;
+  onSettingsChange: (s: AppSettings) => void;
+  onOpenSettings: () => void;
   onMessagesChange?: () => void;
 };
 
-export function ChatPanel({ thread, settings, onMessagesChange }: Props) {
+export function ChatPanel({
+  thread,
+  settings,
+  onSettingsChange,
+  onOpenSettings,
+  onMessagesChange,
+}: Props) {
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
