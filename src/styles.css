@@ -261,6 +261,9 @@
     box-shadow: 0 0 0 1px oklch(0.72 0.18 155 / 0.6),
       0 0 40px oklch(0.72 0.18 155 / 0.25);
   }
+}
+
+
 
 
 @keyframes shimmer-text {
