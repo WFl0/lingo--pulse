@@ -214,7 +214,7 @@ export function ChatPanel({
               e.preventDefault();
               submit(input);
             }}
-            className="flex items-end gap-2 glass rounded-2xl p-2"
+            className="flex items-end gap-2 glass ring-saudi rounded-2xl p-2 transition-smooth"
           >
             <textarea
               ref={inputRef}
