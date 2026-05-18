@@ -131,7 +131,7 @@ export function Sidebar({ onOpenSettings, refreshKey }: Props) {
           <div>
             Made by{" "}
             <span className="text-gradient-gold font-semibold">
-              Ahmed Abu Hlail
+              Ahmed Abu HeliyelAh
             </span>
           </div>
           <div>
