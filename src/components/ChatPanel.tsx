@@ -160,7 +160,7 @@ export function ChatPanel({
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-8 py-8">
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.length === 0 && (
-            <EmptyState />
+            <EmptyState onPick={(s) => submit(s)} />
           )}
           <AnimatePresence initial={false}>
             {messages.map((m) => (
