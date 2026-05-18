@@ -46,8 +46,8 @@ export function Welcome() {
                 className="h-16 w-16 object-contain"
               />
             </div>
-            <h1 className="text-4xl font-bold tracking-tight text-gradient-primary mb-3">
-              LINGO PULSE
+            <h1 className="text-4xl font-bold tracking-tight mb-3">
+              <span className="text-shimmer">LINGO PULSE</span>
             </h1>
             <p className="text-lg text-foreground/80 mb-2">
               Your luxury AI conversation companion
