@@ -380,15 +380,18 @@ function EmptyState({ onPick }: { onPick: (text: string) => void }) {
         respond, and help polish your English along the way.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-8 max-w-2xl mx-auto">
-        {suggestions.map((s) => (
-          <button
+        {suggestions.map((s, i) => (
+          <motion.button
             key={s}
             type="button"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 + i * 0.08, duration: 0.4 }}
             onClick={() => onPick(s)}
-            className="glass rounded-xl px-4 py-3 text-sm text-foreground/80 hover:text-foreground hover:scale-[1.03] transition-smooth text-left"
+            className="glass lift rounded-xl px-4 py-3 text-sm text-foreground/80 hover:text-foreground text-left"
           >
             "{s}"
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>
