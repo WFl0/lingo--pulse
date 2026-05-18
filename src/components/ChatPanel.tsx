@@ -190,7 +190,7 @@ export function ChatPanel({
       <div className="border-t border-border glass-strong">
         <div className="max-w-3xl mx-auto px-4 md:px-8 py-6">
           {/* Mic + waves */}
-          <div className="flex flex-col items-center mb-4">
+          <div className="flex flex-col items-center mb-4 halo">
             <MicButton
               listening={listening}
               speaking={speaking}
