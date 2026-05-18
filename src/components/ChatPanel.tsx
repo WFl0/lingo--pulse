@@ -190,7 +190,7 @@ export function ChatPanel({
       <div className="border-t border-border glass-strong">
         <div className="max-w-3xl mx-auto px-4 md:px-8 py-6">
           {/* Mic + waves */}
-          <div className="flex flex-col items-center mb-4 halo">
+          <div className="flex flex-col items-center mb-4">
             <MicButton
               listening={listening}
               speaking={speaking}
@@ -214,7 +214,7 @@ export function ChatPanel({
               e.preventDefault();
               submit(input);
             }}
-            className="flex items-end gap-2 glass ring-saudi rounded-2xl p-2 transition-smooth"
+            className="flex items-end gap-2 glass rounded-2xl p-2"
           >
             <textarea
               ref={inputRef}
@@ -310,51 +310,34 @@ function MessageBubble({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="group flex gap-3 items-start"
+      transition={{ duration: 0.4 }}
+      className="group"
     >
-      <div
-        className="shrink-0 grid h-8 w-8 place-items-center rounded-full text-[10px] font-bold tracking-wider"
-        style={{
-          background: "var(--gradient-primary)",
-          color: "var(--primary-foreground)",
-          boxShadow: "0 4px 16px -4px oklch(0.72 0.18 155 / 0.55)",
-        }}
-        aria-hidden
-      >
-        LP
+      <div className="prose prose-invert prose-sm max-w-none text-foreground/95 leading-relaxed">
+        <ReactMarkdown>{main}</ReactMarkdown>
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="prose prose-invert prose-sm max-w-none text-foreground/95 leading-relaxed">
-          <ReactMarkdown>{main}</ReactMarkdown>
-        </div>
-        {correction && (
-          <div className="mt-3 glass rounded-xl px-4 py-3 text-xs border-l-2 border-accent">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-accent/80 mb-1.5">
-              <Sparkles className="h-3 w-3" />
-              Polished
-            </div>
-            <div className="prose prose-invert prose-xs max-w-none text-foreground/85">
-              <ReactMarkdown>{correction}</ReactMarkdown>
-            </div>
+      {correction && (
+        <div className="mt-3 glass rounded-xl px-4 py-3 text-xs border-l-2 border-accent">
+          <div className="prose prose-invert prose-xs max-w-none text-foreground/85">
+            <ReactMarkdown>{correction}</ReactMarkdown>
           </div>
-        )}
-        <div className="mt-2 opacity-0 group-hover:opacity-100 transition-smooth">
-          <button
-            onClick={() => (speaking ? onStop() : onReplay(main))}
-            className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5"
-          >
-            {speaking ? (
-              <>
-                <VolumeX className="h-3 w-3" /> Stop
-              </>
-            ) : (
-              <>
-                <Volume2 className="h-3 w-3" /> Replay
-              </>
-            )}
-          </button>
         </div>
+      )}
+      <div className="mt-2 opacity-0 group-hover:opacity-100 transition-smooth">
+        <button
+          onClick={() => (speaking ? onStop() : onReplay(main))}
+          className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5"
+        >
+          {speaking ? (
+            <>
+              <VolumeX className="h-3 w-3" /> Stop
+            </>
+          ) : (
+            <>
+              <Volume2 className="h-3 w-3" /> Replay
+            </>
+          )}
+        </button>
       </div>
     </motion.div>
   );
@@ -380,18 +363,15 @@ function EmptyState({ onPick }: { onPick: (text: string) => void }) {
         respond, and help polish your English along the way.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-8 max-w-2xl mx-auto">
-        {suggestions.map((s, i) => (
-          <motion.button
+        {suggestions.map((s) => (
+          <button
             key={s}
             type="button"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 + i * 0.08, duration: 0.4 }}
             onClick={() => onPick(s)}
-            className="glass lift rounded-xl px-4 py-3 text-sm text-foreground/80 hover:text-foreground text-left"
+            className="glass rounded-xl px-4 py-3 text-sm text-foreground/80 hover:text-foreground hover:scale-[1.03] transition-smooth text-left"
           >
             "{s}"
-          </motion.button>
+          </button>
         ))}
       </div>
     </div>
