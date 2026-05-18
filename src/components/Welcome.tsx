@@ -82,19 +82,24 @@ export function Welcome() {
               Begin Conversation
             </button>
 
-            <div className="mt-8 pt-6 border-t border-border space-y-1">
-              <p className="text-xs text-muted-foreground">
-                Designed & developed by{" "}
-                <span className="text-gradient-gold font-semibold">
-                  Ahmed Abu Hlail
+            <div className="mt-8 pt-6 relative">
+              <div className="gold-divider mb-5" />
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <span className="h-px w-6 bg-gradient-to-r from-transparent to-[var(--gold)]/70" />
+                <span className="text-[10px] tracking-[0.35em] uppercase text-[var(--gold)]/80">
+                  Crafted by
                 </span>
+                <span className="h-px w-6 bg-gradient-to-l from-transparent to-[var(--gold)]/70" />
+              </div>
+              <p className="text-base font-display font-semibold tracking-wide text-gradient-gold">
+                AHMED ABO HELIYEL
               </p>
-              <p className="text-xs">
-                <span className="text-gradient-gold font-semibold">
-                  صناعة سعودية 100/100
-                </span>{" "}
-                🇸🇦
-              </p>
+              <div className="mt-3 inline-flex items-center gap-2 glass rounded-full px-3 py-1">
+                <span className="text-[10px] tracking-[0.25em] uppercase text-gradient-gold font-semibold">
+                  صناعة سعودية ١٠٠٪
+                </span>
+                <span className="text-sm leading-none">🇸🇦</span>
+              </div>
             </div>
           </motion.div>
         </motion.div>
