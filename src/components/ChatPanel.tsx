@@ -343,7 +343,12 @@ function MessageBubble({
   );
 }
 
-function EmptyState() {
+function EmptyState({ onPick }: { onPick: (text: string) => void }) {
+  const suggestions = [
+    "Tell me about your day",
+    "Help me practice English",
+    "Let's debate an idea",
+  ];
   return (
     <div className="text-center py-12 animate-float-up">
       <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 text-xs text-muted-foreground mb-6">
@@ -358,17 +363,15 @@ function EmptyState() {
         respond, and help polish your English along the way.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-8 max-w-2xl mx-auto">
-        {[
-          "Tell me about your day",
-          "Help me practice English",
-          "Let's debate an idea",
-        ].map((s) => (
-          <div
+        {suggestions.map((s) => (
+          <button
             key={s}
-            className="glass rounded-xl px-4 py-3 text-sm text-foreground/80"
+            type="button"
+            onClick={() => onPick(s)}
+            className="glass rounded-xl px-4 py-3 text-sm text-foreground/80 hover:text-foreground hover:scale-[1.03] transition-smooth text-left"
           >
             "{s}"
-          </div>
+          </button>
         ))}
       </div>
     </div>
