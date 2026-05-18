@@ -29,9 +29,10 @@ export function useSpeechRecognition() {
     }
     setSupported(true);
     const rec: SpeechRecognitionLike = new SR();
-    // Single-utterance mode = far fewer false triggers from background noise.
-    rec.continuous = false;
+    // Continuous mode so brief silences don't auto-close the session.
+    rec.continuous = true;
     rec.interimResults = true;
+    (rec as any).maxAlternatives = 1;
     rec.lang = "en-US";
     rec.onresult = (event: any) => {
       let interim = "";
