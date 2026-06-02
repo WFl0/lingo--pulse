@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThreadIdRouteImport } from './routes/$threadId'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
+import { Route as ApiPersonaTurnRouteImport } from './routes/api/persona-turn'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
 const ThreadIdRoute = ThreadIdRouteImport.update({
@@ -29,6 +30,11 @@ const ApiTtsRoute = ApiTtsRouteImport.update({
   path: '/api/tts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPersonaTurnRoute = ApiPersonaTurnRouteImport.update({
+  id: '/api/persona-turn',
+  path: '/api/persona-turn',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$threadId': typeof ThreadIdRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/persona-turn': typeof ApiPersonaTurnRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$threadId': typeof ThreadIdRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/persona-turn': typeof ApiPersonaTurnRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$threadId': typeof ThreadIdRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/persona-turn': typeof ApiPersonaTurnRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$threadId' | '/api/chat' | '/api/tts'
+  fullPaths: '/' | '/$threadId' | '/api/chat' | '/api/persona-turn' | '/api/tts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$threadId' | '/api/chat' | '/api/tts'
-  id: '__root__' | '/' | '/$threadId' | '/api/chat' | '/api/tts'
+  to: '/' | '/$threadId' | '/api/chat' | '/api/persona-turn' | '/api/tts'
+  id:
+    | '__root__'
+    | '/'
+    | '/$threadId'
+    | '/api/chat'
+    | '/api/persona-turn'
+    | '/api/tts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ThreadIdRoute: typeof ThreadIdRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiPersonaTurnRoute: typeof ApiPersonaTurnRoute
   ApiTtsRoute: typeof ApiTtsRoute
 }
 
@@ -92,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTtsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/persona-turn': {
+      id: '/api/persona-turn'
+      path: '/api/persona-turn'
+      fullPath: '/api/persona-turn'
+      preLoaderRoute: typeof ApiPersonaTurnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -106,6 +129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ThreadIdRoute: ThreadIdRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiPersonaTurnRoute: ApiPersonaTurnRoute,
   ApiTtsRoute: ApiTtsRoute,
 }
 export const routeTree = rootRouteImport
