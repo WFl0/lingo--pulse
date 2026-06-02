@@ -9,7 +9,9 @@ import { TopBar } from "./TopBar";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeak } from "@/hooks/useSpeak";
 import { updateThreadMessages, saveSettings } from "@/lib/storage";
+import { getPersona } from "@/lib/personas";
 import type { AppSettings, Thread } from "@/lib/types";
+
 
 type Props = {
   thread: Thread;
@@ -26,6 +28,8 @@ export function ChatPanel({
   onOpenSettings,
   onMessagesChange,
 }: Props) {
+  const persona = getPersona(thread.personaId);
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -33,10 +37,13 @@ export function ChatPanel({
         body: () => ({
           style: settings.style,
           grammarCorrection: settings.grammarCorrection,
+          personaId: thread.personaId,
         }),
       }),
-    [settings.style, settings.grammarCorrection],
+    [settings.style, settings.grammarCorrection, thread.personaId],
   );
+
+
 
   const { messages, sendMessage, status, setMessages } = useChat({
     id: thread.id,
@@ -83,9 +90,10 @@ export function ChatPanel({
     const cleaned = text.split(/\n---\n/)[0].trim();
     if (cleaned) {
       lastSpokenRef.current = last.id;
-      speak(cleaned);
+      speak(cleaned, persona?.voiceId);
     }
-  }, [messages, status, settings.autoSpeak, speak]);
+  }, [messages, status, settings.autoSpeak, speak, persona?.voiceId]);
+
 
   const submit = async (text: string) => {
     const value = text.trim();
@@ -142,8 +150,9 @@ export function ChatPanel({
   };
 
   const playLast = () => {
-    if (lastAssistantText) speak(lastAssistantText);
+    if (lastAssistantText) speak(lastAssistantText, persona?.voiceId);
   };
+
 
   return (
     <div className="flex-1 flex flex-col h-screen min-w-0">
@@ -156,23 +165,44 @@ export function ChatPanel({
         onStop={stopSpeak}
         onOpenSettings={onOpenSettings}
       />
+      {persona && (
+        <div className="px-4 md:px-8 pt-4">
+          <div className="max-w-3xl mx-auto glass rounded-2xl px-4 py-3 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full grid place-items-center text-lg glass-strong shrink-0">
+              {persona.emoji}
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-gradient-gold truncate">
+                {persona.name}
+              </div>
+              <div className="text-[11px] text-muted-foreground truncate">
+                {persona.trait}
+              </div>
+            </div>
+            <span className="ml-auto text-[10px] tracking-wider uppercase text-muted-foreground">
+              Persona
+            </span>
+          </div>
+        </div>
+      )}
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-8 py-8">
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.length === 0 && (
-            <EmptyState onPick={(s) => submit(s)} />
+            <EmptyState persona={persona} onPick={(s) => submit(s)} />
           )}
           <AnimatePresence initial={false}>
             {messages.map((m) => (
               <MessageBubble
                 key={m.id}
                 message={m}
-                onReplay={(text) => speak(text)}
+                onReplay={(text) => speak(text, persona?.voiceId)}
                 speaking={speaking}
                 onStop={stopSpeak}
               />
             ))}
           </AnimatePresence>
+
           {status === "submitted" && (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -343,24 +373,39 @@ function MessageBubble({
   );
 }
 
-function EmptyState({ onPick }: { onPick: (text: string) => void }) {
-  const suggestions = [
-    "Tell me about your day",
-    "Help me practice English",
-    "Let's debate an idea",
-  ];
+function EmptyState({
+  persona,
+  onPick,
+}: {
+  persona?: ReturnType<typeof getPersona>;
+  onPick: (text: string) => void;
+}) {
+  const suggestions = persona
+    ? [
+        `Hi ${persona.shortName}, how are you today?`,
+        `${persona.shortName}, tell me something about yourself.`,
+        `What do you love most, ${persona.shortName}?`,
+      ]
+    : [
+        "Tell me about your day",
+        "Help me practice English",
+        "Let's debate an idea",
+      ];
   return (
     <div className="text-center py-12 animate-float-up">
       <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 text-xs text-muted-foreground mb-6">
         <span className="h-1.5 w-1.5 rounded-full bg-[var(--saudi)] animate-pulse" />
-        Ready to listen
+        {persona ? `Chatting with ${persona.shortName}` : "Ready to listen"}
       </div>
       <h2 className="text-3xl md:text-4xl font-bold mb-3">
-        <span className="text-gradient-primary">Speak naturally</span>
+        <span className="text-gradient-primary">
+          {persona ? `Say hi to ${persona.shortName}` : "Speak naturally"}
+        </span>
       </h2>
       <p className="text-muted-foreground max-w-md mx-auto">
-        Tap the microphone and start a real conversation. I'll understand,
-        respond, and help polish your English along the way.
+        {persona
+          ? `${persona.shortName} will chat with you in English — and politely correct any small mistakes along the way.`
+          : "Tap the microphone and start a real conversation. I'll understand, respond, and help polish your English along the way."}
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-8 max-w-2xl mx-auto">
         {suggestions.map((s) => (
@@ -377,3 +422,4 @@ function EmptyState({ onPick }: { onPick: (text: string) => void }) {
     </div>
   );
 }
+

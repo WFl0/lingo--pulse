@@ -13,7 +13,9 @@ export type Thread = {
   title: string;
   updatedAt: number;
   messages: UIMessage[];
+  personaId?: string;
 };
+
 
 // Single, premium female voice (Sarah - ElevenLabs).
 export const DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL";

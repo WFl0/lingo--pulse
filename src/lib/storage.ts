@@ -24,14 +24,19 @@ export function saveThreads(threads: Thread[]) {
   localStorage.setItem(THREADS_KEY, JSON.stringify(threads));
 }
 
-export function createThread(title = "New conversation"): Thread {
+export function createThread(
+  title = "New conversation",
+  personaId?: string,
+): Thread {
   return {
     id: crypto.randomUUID(),
     title,
     updatedAt: Date.now(),
     messages: [],
+    personaId,
   };
 }
+
 
 export function upsertThread(thread: Thread) {
   const all = loadThreads();

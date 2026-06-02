@@ -102,8 +102,9 @@ export function useSpeak() {
   }, []);
 
   const speak = useCallback(
-    async (raw: string) => {
+    async (raw: string, voiceId?: string) => {
       const text = cleanForSpeech(raw || "");
+
       if (!text) return;
       // Skip if already speaking the exact same text
       if (lockRef.current && lastTextRef.current === text) return;
@@ -121,9 +122,10 @@ export function useSpeak() {
         const res = await fetch("/api/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text }),
+          body: JSON.stringify({ text, voiceId }),
           signal: ctrl.signal,
         });
+
 
         if (ctrl.signal.aborted) return;
 
