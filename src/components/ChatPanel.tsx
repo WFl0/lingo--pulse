@@ -90,9 +90,10 @@ export function ChatPanel({
     const cleaned = text.split(/\n---\n/)[0].trim();
     if (cleaned) {
       lastSpokenRef.current = last.id;
-      speak(cleaned);
+      speak(cleaned, persona?.voiceId);
     }
-  }, [messages, status, settings.autoSpeak, speak]);
+  }, [messages, status, settings.autoSpeak, speak, persona?.voiceId]);
+
 
   const submit = async (text: string) => {
     const value = text.trim();
@@ -149,8 +150,9 @@ export function ChatPanel({
   };
 
   const playLast = () => {
-    if (lastAssistantText) speak(lastAssistantText);
+    if (lastAssistantText) speak(lastAssistantText, persona?.voiceId);
   };
+
 
   return (
     <div className="flex-1 flex flex-col h-screen min-w-0">
