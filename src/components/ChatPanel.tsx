@@ -9,7 +9,9 @@ import { TopBar } from "./TopBar";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeak } from "@/hooks/useSpeak";
 import { updateThreadMessages, saveSettings } from "@/lib/storage";
+import { getPersona } from "@/lib/personas";
 import type { AppSettings, Thread } from "@/lib/types";
+
 
 type Props = {
   thread: Thread;
@@ -26,10 +28,7 @@ export function ChatPanel({
   onOpenSettings,
   onMessagesChange,
 }: Props) {
-  const persona = thread.personaId
-    ? (await import("@/lib/personas")).getPersona // placeholder, replaced below
-    : undefined;
-  // (the line above is dead; we import statically below)
+  const persona = getPersona(thread.personaId);
 
   const transport = useMemo(
     () =>
@@ -43,6 +42,7 @@ export function ChatPanel({
       }),
     [settings.style, settings.grammarCorrection, thread.personaId],
   );
+
 
 
   const { messages, sendMessage, status, setMessages } = useChat({
