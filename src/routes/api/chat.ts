@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 import { STYLE_PROMPTS, type ResponseStyle } from "@/lib/types";
-import { buildPersonaSystemPrompt, getPersona } from "@/lib/personas";
+import { getPersona } from "@/lib/personas";
 
 type ChatRequestBody = {
   messages?: unknown;
