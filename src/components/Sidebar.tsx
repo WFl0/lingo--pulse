@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
-import { Plus, Trash2, MessageSquare, Settings as SettingsIcon } from "lucide-react";
+import { Plus, Trash2, MessageSquare, Settings as SettingsIcon, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/logo.png";
 import {
@@ -8,7 +8,9 @@ import {
   loadThreads,
   upsertThread,
 } from "@/lib/storage";
+import { PERSONAS, getPersona } from "@/lib/personas";
 import type { Thread } from "@/lib/types";
+
 
 type Props = {
   onOpenSettings: () => void;
@@ -31,6 +33,16 @@ export function Sidebar({ onOpenSettings, refreshKey }: Props) {
     setThreads(loadThreads());
     navigate({ to: "/$threadId", params: { threadId: t.id } });
   };
+
+  const startPersonaChat = (personaId: string) => {
+    const p = PERSONAS.find((x) => x.id === personaId);
+    if (!p) return;
+    const t = createThread(`${p.shortName} • chat`, personaId);
+    upsertThread(t);
+    setThreads(loadThreads());
+    navigate({ to: "/$threadId", params: { threadId: t.id } });
+  };
+
 
   const remove = (id: string) => {
     deleteThread(id);
