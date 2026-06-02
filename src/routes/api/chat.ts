@@ -3,18 +3,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 import { STYLE_PROMPTS, type ResponseStyle } from "@/lib/types";
+import { buildPersonaSystemPrompt, getPersona } from "@/lib/personas";
 
 type ChatRequestBody = {
   messages?: unknown;
   style?: ResponseStyle;
   grammarCorrection?: boolean;
+  personaId?: string;
 };
 
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
-        const { messages, style, grammarCorrection } =
+        const { messages, style, grammarCorrection, personaId } =
           (await request.json()) as ChatRequestBody;
 
         if (!Array.isArray(messages)) {
@@ -26,24 +28,32 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         }
 
-        const styleKey: ResponseStyle = style ?? "friendly";
-        const styleText = STYLE_PROMPTS[styleKey] ?? STYLE_PROMPTS.friendly;
+        const persona = getPersona(personaId);
 
-        const system = [
-          "You are LINGO PULSE, a luxury AI conversation companion.",
-          "You only speak English. Even if the user writes in another language, respond in clear, natural English.",
-          "Be warm, intelligent, and human — like a thoughtful real person, not a robotic assistant.",
-          "Engage in real dialogue: ask follow-up questions, share opinions, and gently push back when the user's reasoning could be sharper.",
-          styleText,
-          grammarCorrection
-            ? "If the user's message contains spelling or grammar mistakes, OR awkward phrasing, gently correct them at the END of your reply in a small section formatted exactly like this:\n\n---\n**Polished version:** <the corrected/polished sentence>\n*Note:* <one short, kind explanation of what changed>\n\nOnly include this section when there is a real improvement to make. Never shame the user."
-            : "",
-        ]
-          .filter(Boolean)
-          .join("\n\n");
+        let system: string;
+        if (persona) {
+          system = buildPersonaSystemPrompt(persona);
+        } else {
+          const styleKey: ResponseStyle = style ?? "friendly";
+          const styleText = STYLE_PROMPTS[styleKey] ?? STYLE_PROMPTS.friendly;
+          system = [
+            "You are LINGO PULSE, a luxury AI conversation companion.",
+            "Respond ONLY in clear, natural English — even if the user writes another language.",
+            "Be warm, smart, and human. Sound like a thoughtful real person, never robotic.",
+            "BE CONCISE: keep replies to 1–3 short sentences unless the user explicitly asks for detail.",
+            "Ask a short follow-up question when it keeps the dialogue alive — never lecture.",
+            styleText,
+            grammarCorrection
+              ? "If the user's message has spelling, grammar, OR awkward phrasing, gently correct it at the END of your reply in this exact format:\n\n---\n**Polished version:** <the corrected/polished sentence>\n*Note:* <one short kind explanation>\n\nOnly include this section when there is a real improvement. Never shame the user."
+              : "",
+          ]
+            .filter(Boolean)
+            .join("\n\n");
+        }
 
         const gateway = createLovableAiGatewayProvider(apiKey);
-        const model = gateway("google/gemini-3-flash-preview");
+        // Use the fast preview model for snappy replies
+        const model = gateway("google/gemini-3.1-flash-lite-preview");
 
         const result = streamText({
           model,
