@@ -26,6 +26,11 @@ export function ChatPanel({
   onOpenSettings,
   onMessagesChange,
 }: Props) {
+  const persona = thread.personaId
+    ? (await import("@/lib/personas")).getPersona // placeholder, replaced below
+    : undefined;
+  // (the line above is dead; we import statically below)
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -33,10 +38,12 @@ export function ChatPanel({
         body: () => ({
           style: settings.style,
           grammarCorrection: settings.grammarCorrection,
+          personaId: thread.personaId,
         }),
       }),
-    [settings.style, settings.grammarCorrection],
+    [settings.style, settings.grammarCorrection, thread.personaId],
   );
+
 
   const { messages, sendMessage, status, setMessages } = useChat({
     id: thread.id,
