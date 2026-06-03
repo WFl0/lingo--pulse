@@ -58,19 +58,31 @@ export const Route = createFileRoute("/api/persona-turn")({
           .filter(Boolean) as Array<{ role: "user" | "assistant"; content: string }>;
 
         const gateway = createLovableAiGatewayProvider(apiKey);
-        const { text } = await generateText({
-          model: gateway("google/gemini-3.1-flash-lite-preview"),
-          system,
-          messages:
-            history.length > 0
-              ? history
-              : [{ role: "user", content: `Say a quick hi and bring up ${topic}.` }],
-        });
-
-        return new Response(JSON.stringify({ text: text.trim() }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
+        try {
+          const { text } = await generateText({
+            model: gateway("google/gemini-3.1-flash-lite-preview"),
+            system,
+            messages:
+              history.length > 0
+                ? history
+                : [{ role: "user", content: `Say a quick hi and bring up ${topic}.` }],
+          });
+          return new Response(JSON.stringify({ text: text.trim() }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        } catch (err: any) {
+          const msg = String(err?.message ?? err);
+          const status = /Too Many Requests|429/i.test(msg)
+            ? 429
+            : /402|credit/i.test(msg)
+              ? 402
+              : 500;
+          return new Response(
+            JSON.stringify({ error: msg.slice(0, 200) }),
+            { status, headers: { "Content-Type": "application/json" } },
+          );
+        }
       },
     },
   },
