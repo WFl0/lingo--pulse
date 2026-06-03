@@ -21,16 +21,26 @@ export const Route = createFileRoute("/api/persona-turn")({
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
+        const TOPICS = [
+          "weekend plans", "favorite food", "a recent trip", "Riyadh vs Jeddah",
+          "football and Al-Hilal", "coffee shops", "new movies", "learning English",
+          "cars and driving", "video games", "family gatherings", "Ramadan memories",
+          "the desert", "future dreams", "music taste", "tech gadgets",
+          "studying abroad", "fashion trends", "a funny story", "the weather today",
+        ];
+        const topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+
         const system = [
           persona.systemPrompt,
           "",
-          "ROLE: You are chatting WITH an AI English tutor named LINGO PULSE.",
-          "- Reply ONLY in English, fully in character.",
-          "- Keep it SHORT and natural: 1–2 sentences.",
-          "- About 60% of the time, include ONE small natural English mistake that fits your character (the tutor will correct it).",
-          "- Ask the tutor a question sometimes to keep the chat alive.",
-          "- Do NOT add corrections, notes, translations, or any meta commentary. Just talk like a real person.",
-          "- If this is the first turn (no prior tutor message), start with a friendly greeting or a topic you care about.",
+          "ROLE: You are chatting WITH an AI English tutor named LINGO PULSE. The user is just listening.",
+          "- Reply ONLY in English, fully in character, with a real human vibe.",
+          "- VERY SHORT: 1–2 short sentences MAX. Never a paragraph.",
+          "- Sound natural and casual — use contractions, small fillers ('hmm', 'yeah', 'wallah', 'honestly').",
+          "- About 60% of the time, slip ONE small natural English mistake that fits your character. The tutor will correct it.",
+          "- Vary the conversation: change topics naturally every few turns. Ask the tutor a quick question sometimes.",
+          `- If this is the FIRST turn (no prior tutor message), start with a quick greeting and bring up: ${topic}.`,
+          "- Do NOT add corrections, notes, translations, emojis, or meta commentary. Just talk.",
         ].join("\n");
 
         // Flip roles from the persona's point of view:
@@ -54,7 +64,7 @@ export const Route = createFileRoute("/api/persona-turn")({
           messages:
             history.length > 0
               ? history
-              : [{ role: "user", content: "Say hello and start the conversation." }],
+              : [{ role: "user", content: `Say a quick hi and bring up ${topic}.` }],
         });
 
         return new Response(JSON.stringify({ text: text.trim() }), {
