@@ -116,11 +116,20 @@ export function ChatPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ personaId: persona.id, messages }),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        if (res.status === 429) {
+          // Rate limited — pause the auto loop briefly
+          setAutoMode(false);
+          console.warn("Persona turn rate-limited, pausing auto-chat.");
+        }
+        return;
+      }
       const { text } = (await res.json()) as { text?: string };
       const value = text?.trim();
       if (!value) return;
       await sendMessage({ text: value });
+    } catch (e) {
+      console.error("persona-turn failed", e);
     } finally {
       setPersonaLoading(false);
     }
@@ -136,7 +145,7 @@ export function ChatPanel({
     if (messages.length > 0 && last?.role !== "assistant") return;
     const t = setTimeout(() => {
       if (autoModeRef.current) generatePersonaTurn();
-    }, 1600);
+    }, 4000);
     return () => clearTimeout(t);
   }, [isPersonaMode, autoMode, status, personaLoading, messages, generatePersonaTurn]);
 
