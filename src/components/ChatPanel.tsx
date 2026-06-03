@@ -81,31 +81,21 @@ export function ChatPanel({
     if (!isPersonaMode) inputRef.current?.focus();
   }, [thread.id, status, isPersonaMode]);
 
-  // Speak the LAST message when streaming completes
-  // In persona mode: persona uses its voice, tutor uses default.
-  // In normal mode: only assistant is spoken.
+  // Speak streamed assistant messages when they finish.
+  // Persona 'user' turns are spoken directly inside generatePersonaTurn (before sending),
+  // so this effect only handles assistant (tutor or normal AI) replies.
   useEffect(() => {
     if (!settings.autoSpeak) return;
     if (status !== "ready") return;
     const last = messages[messages.length - 1];
     if (!last) return;
+    if (last.role !== "assistant") return;
     if (lastSpokenRef.current === last.id) return;
-
-    if (isPersonaMode) {
-      const text = extractText(last).split(/\n---\n/)[0].trim();
-      if (!text) return;
-      lastSpokenRef.current = last.id;
-      // In persona mode role 'user' = persona, role 'assistant' = tutor
-      const voiceId = last.role === "user" ? persona?.voiceId : undefined;
-      speak(text, voiceId);
-    } else {
-      if (last.role !== "assistant") return;
-      const text = extractText(last).split(/\n---\n/)[0].trim();
-      if (!text) return;
-      lastSpokenRef.current = last.id;
-      speak(text);
-    }
-  }, [messages, status, settings.autoSpeak, speak, persona?.voiceId, isPersonaMode]);
+    const text = extractText(last).split(/\n---\n/)[0].trim();
+    if (!text) return;
+    lastSpokenRef.current = last.id;
+    speak(text);
+  }, [messages, status, settings.autoSpeak, speak]);
 
   const generatePersonaTurn = useCallback(async () => {
     if (!persona) return;
@@ -118,7 +108,6 @@ export function ChatPanel({
       });
       if (!res.ok) {
         if (res.status === 429) {
-          // Rate limited — pause the auto loop briefly
           setAutoMode(false);
           console.warn("Persona turn rate-limited, pausing auto-chat.");
         }
@@ -127,27 +116,32 @@ export function ChatPanel({
       const { text } = (await res.json()) as { text?: string };
       const value = text?.trim();
       if (!value) return;
+      // Speak the persona FIRST with its own voice, then forward to the tutor.
+      if (settings.autoSpeak) {
+        await speak(value, persona.voiceId);
+      }
       await sendMessage({ text: value });
     } catch (e) {
       console.error("persona-turn failed", e);
     } finally {
       setPersonaLoading(false);
     }
-  }, [persona, messages, sendMessage]);
+  }, [persona, messages, sendMessage, settings.autoSpeak, speak]);
 
-  // Auto-loop: when the tutor finishes replying, queue the next persona turn.
+  // Auto-loop: when the tutor finishes replying (and finishes speaking),
+  // queue the next persona turn.
   useEffect(() => {
     if (!isPersonaMode || !autoMode) return;
     if (status !== "ready") return;
     if (personaLoading) return;
+    if (speaking) return;
     const last = messages[messages.length - 1];
-    // Trigger next persona turn only after a tutor reply (or to kick things off when empty).
     if (messages.length > 0 && last?.role !== "assistant") return;
     const t = setTimeout(() => {
       if (autoModeRef.current) generatePersonaTurn();
-    }, 4000);
+    }, 1200);
     return () => clearTimeout(t);
-  }, [isPersonaMode, autoMode, status, personaLoading, messages, generatePersonaTurn]);
+  }, [isPersonaMode, autoMode, status, personaLoading, speaking, messages, generatePersonaTurn]);
 
   const submit = async (text: string) => {
     const value = text.trim();
