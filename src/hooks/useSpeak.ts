@@ -102,14 +102,12 @@ export function useSpeak() {
   }, []);
 
   const speak = useCallback(
-    async (raw: string, voiceId?: string) => {
+    async (raw: string, voiceId?: string): Promise<void> => {
       const text = cleanForSpeech(raw || "");
 
       if (!text) return;
-      // Skip if already speaking the exact same text
       if (lockRef.current && lastTextRef.current === text) return;
 
-      // Hard reset previous playback
       stop();
 
       lockRef.current = true;
@@ -125,7 +123,6 @@ export function useSpeak() {
           body: JSON.stringify({ text, voiceId }),
           signal: ctrl.signal,
         });
-
 
         if (ctrl.signal.aborted) return;
 
@@ -144,26 +141,29 @@ export function useSpeak() {
         const audio = new Audio(url);
         audioRef.current = audio;
 
-        audio.onended = () => {
-          lockRef.current = false;
-          setSpeaking(false);
-          cleanup();
-        };
-        audio.onerror = () => {
-          lockRef.current = false;
-          setSpeaking(false);
-          cleanup();
-        };
-
         setSpeaking(true);
-        try {
-          await audio.play();
-        } catch {
-          lockRef.current = false;
-          setSpeaking(false);
-          cleanup();
-          speakBrowser(text);
-        }
+
+        await new Promise<void>((resolve) => {
+          audio.onended = () => {
+            lockRef.current = false;
+            setSpeaking(false);
+            cleanup();
+            resolve();
+          };
+          audio.onerror = () => {
+            lockRef.current = false;
+            setSpeaking(false);
+            cleanup();
+            resolve();
+          };
+          audio.play().catch(() => {
+            lockRef.current = false;
+            setSpeaking(false);
+            cleanup();
+            speakBrowser(text);
+            resolve();
+          });
+        });
       } catch (err: any) {
         if (err?.name === "AbortError") return;
         lockRef.current = false;
