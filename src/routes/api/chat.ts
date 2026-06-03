@@ -70,8 +70,8 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         const gateway = createLovableAiGatewayProvider(apiKey);
-        // Use the fast preview model for snappy replies
-        const model = gateway("google/gemini-3.1-flash-lite-preview");
+        // Stable fast model, less rate-limited than the lite preview.
+        const model = gateway("google/gemini-3-flash-preview");
 
         const result = streamText({
           model,
